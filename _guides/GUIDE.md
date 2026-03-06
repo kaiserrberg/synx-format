@@ -4,6 +4,8 @@
   </a>
 </p>
 
+> **🔗 [View logo →](https://aperturesyndicate.com/branding/aperturesyndicate.png)**
+
 <h1 align="center">SYNX v3.0 — The Complete Guide</h1>
 
 <p align="center">
