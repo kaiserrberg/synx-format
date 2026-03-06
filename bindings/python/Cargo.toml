@@ -1,0 +1,15 @@
+[package]
+name = "synx-python"
+version = "3.0.0"
+edition = "2021"
+authors = ["APERTURESyndicate <support@aperturesyndicate.com>"]
+description = "SYNX Python native module via PyO3"
+license = "MIT"
+
+[lib]
+name = "synx_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+synx-core = { path = "../../crates/synx-core" }
+pyo3 = { version = "0.24", features = ["extension-module"] }

@@ -1,0 +1,141 @@
+{
+  "scopeName": "source.synx",
+  "name": "SYNX",
+  "fileTypes": ["synx"],
+  "patterns": [
+    { "include": "#mode-declaration" },
+    { "include": "#static-declaration" },
+    { "include": "#comment-hash" },
+    { "include": "#comment-slash" },
+    { "include": "#list-item" },
+    { "include": "#key-with-markers" },
+    { "include": "#key-with-type" },
+    { "include": "#key-simple" },
+    { "include": "#parent-key" },
+    { "include": "#block-pipe" }
+  ],
+  "repository": {
+    "mode-declaration": {
+      "match": "^(!active)\\s*$",
+      "captures": {
+        "1": { "name": "keyword.control.mode.synx" }
+      }
+    },
+    "static-declaration": {
+      "match": "^(!static)\\s*$",
+      "captures": {
+        "1": { "name": "keyword.control.mode.synx" }
+      }
+    },
+    "comment-hash": {
+      "match": "^\\s*(#)(.*)$",
+      "name": "comment.line.hash.synx"
+    },
+    "comment-slash": {
+      "match": "^\\s*(//)(.*)$",
+      "name": "comment.line.double-slash.synx"
+    },
+    "list-item": {
+      "match": "^(\\s*)(-)\\s+(.*)",
+      "captures": {
+        "2": { "name": "keyword.operator.list.synx" },
+        "3": {
+          "patterns": [
+            { "include": "#values" }
+          ]
+        }
+      }
+    },
+    "key-with-markers": {
+      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))?(\\[[^\\]]*\\])?((?::[a-zA-Z_]\\w*)+)\\s+(.*?)\\s*$",
+      "captures": {
+        "2": { "name": "entity.name.tag.synx" },
+        "3": { "name": "storage.type.synx" },
+        "4": { "name": "support.type.property-name.synx" },
+        "5": { "name": "entity.name.function.synx" },
+        "6": {
+          "patterns": [
+            { "include": "#template-placeholder" },
+            { "include": "#values" }
+          ]
+        }
+      }
+    },
+    "key-with-type": {
+      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))(\\[[^\\]]*\\])?\\s+(.*?)\\s*$",
+      "captures": {
+        "2": { "name": "entity.name.tag.synx" },
+        "3": { "name": "storage.type.synx" },
+        "4": { "name": "support.type.property-name.synx" },
+        "5": {
+          "patterns": [
+            { "include": "#values" }
+          ]
+        }
+      }
+    },
+    "key-simple": {
+      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s+(.*?)\\s*$",
+      "captures": {
+        "2": { "name": "entity.name.tag.synx" },
+        "3": {
+          "patterns": [
+            { "include": "#values" }
+          ]
+        }
+      }
+    },
+    "parent-key": {
+      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s*$",
+      "captures": {
+        "2": { "name": "entity.name.section.synx" }
+      }
+    },
+    "block-pipe": {
+      "match": "\\|\\s*$",
+      "name": "keyword.operator.pipe.synx"
+    },
+    "template-placeholder": {
+      "match": "\\{([^}]+)\\}",
+      "captures": {
+        "0": { "name": "variable.other.placeholder.synx" }
+      }
+    },
+    "values": {
+      "patterns": [
+        {
+          "match": "^(true|false)$",
+          "name": "constant.language.boolean.synx"
+        },
+        {
+          "match": "^null$",
+          "name": "constant.language.null.synx"
+        },
+        {
+          "match": "^-?\\d+\\.\\d+$",
+          "name": "constant.numeric.float.synx"
+        },
+        {
+          "match": "^-?\\d+$",
+          "name": "constant.numeric.integer.synx"
+        },
+        {
+          "match": "#[0-9a-fA-F]{3,8}\\b",
+          "name": "constant.other.color.synx"
+        },
+        {
+          "match": "\\|",
+          "name": "keyword.operator.pipe.synx"
+        },
+        {
+          "match": "\\{[^}]+\\}",
+          "name": "variable.other.placeholder.synx"
+        },
+        {
+          "match": ".+",
+          "name": "string.unquoted.synx"
+        }
+      ]
+    }
+  }
+}

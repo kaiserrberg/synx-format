@@ -1,0 +1,10 @@
+{
+  "iconDefinitions": {
+    "synx-icon": {
+      "iconPath": "../icons/synx-file.svg"
+    }
+  },
+  "fileExtensions": {
+    "synx": "synx-icon"
+  }
+}

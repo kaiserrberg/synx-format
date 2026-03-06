@@ -1,0 +1,18 @@
+[package]
+name = "synx-core"
+version = "3.0.0"
+edition = "2021"
+authors = ["APERTURESyndicate <support@aperturesyndicate.com>"]
+description = "SYNX — The Active Data Format. Core parser + engine with full !active support."
+license = "MIT"
+repository = "https://github.com/kaiserrberg/synx-format"
+keywords = ["synx", "parser", "config", "json-alternative", "data-format"]
+categories = ["parser-implementations", "config"]
+
+[dependencies]
+memchr = "2"
+itoa = "1"
+ryu = "1"
+
+[dev-dependencies]
+

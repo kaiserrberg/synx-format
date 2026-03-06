@@ -1,0 +1,166 @@
+{
+  "description": "A high-performance game server config used for SYNX benchmarks.",
+  "cache": {
+    "port": 6379,
+    "ttl": 3600,
+    "key_prefix": "synx:bench:",
+    "db": 0,
+    "eviction_policy": "allkeys-lru",
+    "provider": "redis",
+    "host": "redis.internal",
+    "compression": true,
+    "max_size": 100000
+  },
+  "rate_limit": {
+    "enabled": true,
+    "requests_per_minute": 120,
+    "burst": 30,
+    "penalty_seconds": 60,
+    "whitelist": [
+      "127.0.0.1",
+      "10.0.0.0/8",
+      "172.16.0.0/12"
+    ]
+  },
+  "metrics": {
+    "provider": "prometheus",
+    "path": "/metrics",
+    "labels": [
+      "service",
+      "version",
+      "region"
+    ],
+    "port": 9090,
+    "interval": 15,
+    "enabled": true
+  },
+  "map_rotation": [
+    "Arena of Doom",
+    "Crystal Caverns",
+    "Wario Stadium",
+    "Shadow Realm",
+    "Lava Lair",
+    "Thunder Peak"
+  ],
+  "database": {
+    "replica": {
+      "port": 5432,
+      "host": "db-replica.internal",
+      "name": "totalwario_prod",
+      "user": "app_readonly",
+      "pool_min": 2,
+      "pool_max": 20
+    },
+    "primary": {
+      "name": "totalwario_prod",
+      "pool_min": 5,
+      "pool_max": 50,
+      "port": 5432,
+      "host": "db-primary.internal",
+      "connect_timeout": 10,
+      "user": "app_user",
+      "ssl_mode": "verify-full"
+    }
+  },
+  "gameplay": {
+    "respawn_delay": 3,
+    "regions": [
+      "EU",
+      "US",
+      "APAC",
+      "SA"
+    ],
+    "max_players": 64,
+    "tick_rate": 60,
+    "friendly_fire": false,
+    "gravity": 9.81,
+    "boss_hp": 500,
+    "base_hp": 100,
+    "difficulty": "normal"
+  },
+  "cors": {
+    "origins": [
+      "https://totalwario.com",
+      "https://app.totalwario.com",
+      "https://admin.totalwario.com"
+    ],
+    "allow_credentials": true,
+    "max_age": 86400,
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "headers": [
+      "Authorization",
+      "Content-Type",
+      "X-Request-ID",
+      "X-Forwarded-For"
+    ]
+  },
+  "debug": false,
+  "server": {
+    "keep_alive": true,
+    "ssl": {
+      "cert": "/etc/ssl/certs/server.crt",
+      "protocols": [
+        "TLSv1.2",
+        "TLSv1.3"
+      ],
+      "key": "/etc/ssl/private/server.key",
+      "enabled": true
+    },
+    "host": "0.0.0.0",
+    "timeout": 30,
+    "workers": 16,
+    "port": 8080,
+    "max_connections": 10000
+  },
+  "features": {
+    "cors": true,
+    "rate_limiting": true,
+    "websockets": true,
+    "hot_reload": false,
+    "ab_testing": false,
+    "telemetry": true,
+    "compression": true
+  },
+  "auth": {
+    "provider": "jwt",
+    "refresh_ttl": 604800,
+    "algorithms": [
+      "HS256",
+      "RS256"
+    ],
+    "token_ttl": 86400,
+    "issuer": "api.totalwario.com",
+    "audience": [
+      "web",
+      "mobile",
+      "desktop"
+    ],
+    "secret_key": "top-secret-key-for-bench-only"
+  },
+  "logging": {
+    "max_size_mb": 100,
+    "include_trace": false,
+    "level": "info",
+    "rotate": true,
+    "max_files": 10,
+    "include_caller": true,
+    "format": "json",
+    "output": "stdout"
+  },
+  "environment": "production",
+  "version": "3.0.0",
+  "credits": {
+    "lead_dev": "KaiserBerg",
+    "studio": "APERTURESyndicate",
+    "year": 2026,
+    "license": "MIT"
+  },
+  "app_name": "TotalWario"
+}

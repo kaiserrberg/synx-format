@@ -1,0 +1,53 @@
+!active
+# Живой конфиг проекта TotalWario
+# Все функции (:random, :calc, :env) и ограничения ([]) активны
+
+app_name[required, min:3, max:30] TotalWario
+version[readonly] 2.0.0
+
+variable:
+
+server
+  // Порт из переменной окружения, если нет — 8080
+  port:env:default:8080 PORT
+  host 0.0.0.0
+  ssl_enabled false
+
+gameplay
+  base_hp 100
+  // Движок сам посчитает: 100 * 5 = 500
+  boss_hp:calc base_hp * 5
+  max_players[type:int, min:2, max:64] 16
+  difficulty[enum:easy|normal|hard|nightmare] normal
+
+  // Каждый раз при парсинге — одна случайная фраза
+  greeting:random
+    - Welcome to the arena!
+    - Prepare to fight.
+    - Wario time!
+
+  // Взвешенный рандом: обычный 70%, редкий 20%, легенда 10%
+  loot_tier:random 70 20 10
+    - common
+    - rare
+    - legendary
+
+map_rotation
+  - Arena of Doom
+  - Crystal Caverns
+  - Wario Stadium
+
+rules |
+  1. Не читерить.
+  2. Уважать Синдикат.
+  3. Весело проводить время!
+
+// Секрет — не попадёт в логи
+api_key[required]:secret sk-live-abc123def456
+
+credits
+  lead_dev KaiserBerg
+  studio APERTURESyndicate
+  year 2026
+  // Ссылка — contact будет равен значению lead_dev
+  contact:alias lead_dev

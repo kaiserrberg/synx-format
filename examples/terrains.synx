@@ -1,0 +1,4 @@
+# Terrain types for the game
+terrain:random
+  - item1
+  - item2

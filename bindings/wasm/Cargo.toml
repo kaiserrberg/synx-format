@@ -1,0 +1,15 @@
+[package]
+name = "synx-wasm"
+version = "3.0.0"
+edition = "2021"
+authors = ["APERTURESyndicate <support@aperturesyndicate.com>"]
+description = "SYNX WebAssembly module — parse SYNX in the browser"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+synx-core = { path = "../../crates/synx-core" }
+wasm-bindgen = "0.2"
+

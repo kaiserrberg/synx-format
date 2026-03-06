@@ -1,0 +1,13 @@
+[package]
+name = "synx-c"
+version = "3.0.0"
+edition = "2021"
+authors = ["APERTURESyndicate <support@aperturesyndicate.com>"]
+description = "SYNX C FFI — shared library for embedding SYNX in any language"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+synx-core = { path = "../../crates/synx-core" }

@@ -1,0 +1,15 @@
+{
+  "name": "synx-benchmarks",
+  "version": "3.0.0",
+  "private": true,
+  "description": "SYNX format benchmarks — JSON vs YAML vs SYNX (JS/Native)",
+  "scripts": {
+    "bench:node":   "node --expose-gc bench_node.js",
+    "bench:python": "python bench_python.py",
+    "bench:rust":   "cd bench_rust && cargo bench",
+    "bench:all":    "npm run bench:node && npm run bench:python"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
+}

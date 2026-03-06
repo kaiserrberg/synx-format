@@ -1,0 +1,38 @@
+# Конфиг игры TotalWario (статичный)
+# Нет !active — все данные читаются как есть
+
+app_name(int) 2323
+version 2.0.0
+
+server
+  host 0.0.0.0
+  port 8080
+  ssl_enabled false
+
+gameplay
+  base_hp 100
+  boss_hp 500
+  max_players 16
+  greeting Prepare to fight.
+
+  difficulty normal
+
+map_rotation
+  - Arena of Doom
+  - Crystal Caverns
+  - Wario Stadium
+
+inventory
+  - Меч
+  - Щит
+  - Зелье здоровья
+
+rules |
+  1. Не читерить.
+  2. Уважать Синдикат.
+  3. Весело проводить время!
+
+credits
+  lead_dev KaiserBerg
+  studio APERTURESyndicate
+  year 2026

@@ -1,0 +1,18 @@
+[package]
+name = "synx-node"
+version = "3.0.0"
+edition = "2021"
+authors = ["APERTURESyndicate <support@aperturesyndicate.com>"]
+description = "SYNX Node.js native addon via napi-rs"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+synx-core = { path = "../../crates/synx-core" }
+napi = { version = "2", features = ["napi6"] }
+napi-derive = "2"
+
+[build-dependencies]
+napi-build = "2"

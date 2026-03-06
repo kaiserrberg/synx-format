@@ -1,0 +1,152 @@
+app_name TotalWario
+version 3.0.0
+debug false
+environment production
+description A high-performance game server config used for SYNX benchmarks.
+
+server
+  host 0.0.0.0
+  port 8080
+  workers 16
+  timeout 30
+  max_connections 10000
+  keep_alive true
+  ssl
+    enabled true
+    cert /etc/ssl/certs/server.crt
+    key /etc/ssl/private/server.key
+    protocols
+      - TLSv1.2
+      - TLSv1.3
+
+database
+  primary
+    host db-primary.internal
+    port 5432
+    name totalwario_prod
+    user app_user
+    pool_min 5
+    pool_max 50
+    ssl_mode verify-full
+    connect_timeout 10
+  replica
+    host db-replica.internal
+    port 5432
+    name totalwario_prod
+    user app_readonly
+    pool_min 2
+    pool_max 20
+
+cache
+  provider redis
+  host redis.internal
+  port 6379
+  db 0
+  ttl 3600
+  max_size 100000
+  key_prefix synx:bench:
+  compression true
+  eviction_policy allkeys-lru
+
+logging
+  level info
+  format json
+  output stdout
+  rotate true
+  max_files 10
+  max_size_mb 100
+  include_caller true
+  include_trace false
+
+auth
+  provider jwt
+  secret_key top-secret-key-for-bench-only
+  token_ttl 86400
+  refresh_ttl 604800
+  issuer api.totalwario.com
+  audience
+    - web
+    - mobile
+    - desktop
+  algorithms
+    - HS256
+    - RS256
+
+gameplay
+  base_hp 100
+  boss_hp 500
+  max_players 64
+  tick_rate 60
+  gravity 9.81
+  respawn_delay 3.0
+  friendly_fire false
+  difficulty normal
+  regions
+    - EU
+    - US
+    - APAC
+    - SA
+
+map_rotation
+  - Arena of Doom
+  - Crystal Caverns
+  - Wario Stadium
+  - Shadow Realm
+  - Lava Lair
+  - Thunder Peak
+
+features
+  rate_limiting true
+  cors true
+  compression true
+  websockets true
+  hot_reload false
+  telemetry true
+  ab_testing false
+
+rate_limit
+  enabled true
+  requests_per_minute 120
+  burst 30
+  penalty_seconds 60
+  whitelist
+    - 127.0.0.1
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+
+cors
+  allow_credentials true
+  max_age 86400
+  origins
+    - https://totalwario.com
+    - https://app.totalwario.com
+    - https://admin.totalwario.com
+  methods
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - OPTIONS
+  headers
+    - Authorization
+    - Content-Type
+    - X-Request-ID
+    - X-Forwarded-For
+
+metrics
+  enabled true
+  provider prometheus
+  port 9090
+  path /metrics
+  interval 15
+  labels
+    - service
+    - version
+    - region
+
+credits
+  lead_dev KaiserBerg
+  studio APERTURESyndicate
+  year 2026
+  license MIT
