@@ -5,7 +5,7 @@ All notable changes to this repository are documented in this file.
 ## [3.1.3] - 2026-03-07
 
 ### Changed
-- **Syntax highlighting redesign** (VSCode extension): Improved TextMate grammar with explicit scope names for better semantic coloring. Ключи теперь `entity.name.tag.cold.synx` (холодные — синий, циановый), маркеры `keyword.control.marker.synx` (розовый/красный), значения `string.unquoted.synx` (тёплые — оранжевый, зелёный). Цель: максимальный контраст между структурой (ключи) и данными (значения) для лучшей читаемости при беглом просмотре конфига.
+- **Syntax highlighting redesign** (VSCode extension): Improved TextMate grammar with semantic scopes for clarity. Parent nodes (with nesting) use `entity.name.section` (bright, bold) to highlight structural branches. Leaf nodes (with values) use `support.type.property-name` (calm, subtle) for actual properties. Markers now `keyword.control.marker.synx` (pink/red). Recursive depth coloring: level 0 `keyword.control` (pink), level 1 `entity.name.tag` (bright cyan), level 2 `entity.name.function` (yellow), level 3+ `variable.parameter` (light cyan). This creates visual hierarchy—structure jumps out, data stays quiet.
 
 ## [3.1.2] - 2026-03-07
 

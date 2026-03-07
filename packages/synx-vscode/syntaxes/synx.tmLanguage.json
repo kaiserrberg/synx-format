@@ -10,10 +10,10 @@
     { "include": "#comment-hash" },
     { "include": "#comment-slash" },
     { "include": "#list-item" },
-    { "include": "#key-with-markers" },
-    { "include": "#key-with-type" },
-    { "include": "#key-simple" },
-    { "include": "#parent-key" },
+    { "include": "#level0-keys" },
+    { "include": "#level1-keys" },
+    { "include": "#level2-keys" },
+    { "include": "#level3plus-keys" },
     { "include": "#block-pipe" }
   ],
   "repository": {
@@ -104,50 +104,141 @@
         }
       }
     },
-    "key-with-markers": {
-      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))?(\\[[^\\]]*\\])?((?::[a-zA-Z_]\\w*)+)\\s+(.*?)\\s*$",
-      "captures": {
-        "2": { "name": "entity.name.tag.cold.synx" },
-        "3": { "name": "storage.type.cast.synx" },
-        "4": { "name": "support.type.constraint.synx" },
-        "5": { "name": "keyword.control.marker.synx" },
-        "6": {
-          "patterns": [
-            { "include": "#template-placeholder" },
-            { "include": "#values" }
-          ]
+    "level0-keys": {
+      "patterns": [
+        {
+          "match": "^([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))?(\\[[^\\]]*\\])?((?::[a-zA-Z_]\\w*)+)\\s+(.*?)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.property.level0.synx" },
+            "2": { "name": "storage.type.cast.synx" },
+            "3": { "name": "support.type.constraint.synx" },
+            "4": { "name": "keyword.control.marker.synx" },
+            "5": { "patterns": [{ "include": "#template-placeholder" }, { "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))(\\[[^\\]]*\\])?\\s+(.*?)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.property.level0.synx" },
+            "2": { "name": "storage.type.cast.synx" },
+            "3": { "name": "support.type.constraint.synx" },
+            "4": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s+(.*?)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.property.level0.synx" },
+            "2": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s*$",
+          "name": "entity.name.section.level0.synx"
         }
-      }
+      ]
     },
-    "key-with-type": {
-      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))(\\[[^\\]]*\\])?\\s+(.*?)\\s*$",
-      "captures": {
-        "2": { "name": "entity.name.tag.cold.synx" },
-        "3": { "name": "storage.type.cast.synx" },
-        "4": { "name": "support.type.constraint.synx" },
-        "5": {
-          "patterns": [
-            { "include": "#values" }
-          ]
+    "level1-keys": {
+      "patterns": [
+        {
+          "match": "^( {2})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))?(\\[[^\\]]*\\])?((?::[a-zA-Z_]\\w*)+)\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "entity.name.tag.level1.synx" },
+            "3": { "name": "storage.type.cast.synx" },
+            "4": { "name": "support.type.constraint.synx" },
+            "5": { "name": "keyword.control.marker.synx" },
+            "6": { "patterns": [{ "include": "#template-placeholder" }, { "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {2})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))(\\[[^\\]]*\\])?\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "entity.name.tag.level1.synx" },
+            "3": { "name": "storage.type.cast.synx" },
+            "4": { "name": "support.type.constraint.synx" },
+            "5": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {2})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "support.type.property-name.level1.synx" },
+            "3": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {2})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s*$",
+          "name": "entity.name.section.level1.synx"
         }
-      }
+      ]
     },
-    "key-simple": {
-      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s+(.*?)\\s*$",
-      "captures": {
-        "2": { "name": "entity.name.tag.cold.synx" },
-        "3": {
-          "patterns": [
-            { "include": "#values" }
-          ]
+    "level2-keys": {
+      "patterns": [
+        {
+          "match": "^( {4})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))?(\\[[^\\]]*\\])?((?::[a-zA-Z_]\\w*)+)\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "entity.name.function.level2.synx" },
+            "3": { "name": "storage.type.cast.synx" },
+            "4": { "name": "support.type.constraint.synx" },
+            "5": { "name": "keyword.control.marker.synx" },
+            "6": { "patterns": [{ "include": "#template-placeholder" }, { "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {4})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))(\\[[^\\]]*\\])?\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "entity.name.function.level2.synx" },
+            "3": { "name": "storage.type.cast.synx" },
+            "4": { "name": "support.type.constraint.synx" },
+            "5": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {4})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "support.type.property-name.level2.synx" },
+            "3": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {4})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s*$",
+          "name": "entity.name.section.level2.synx"
         }
-      }
+      ]
     },
-    "parent-key": {
-      "match": "^(\\s*)([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s*$",
-      "captures": {
-        "2": { "name": "entity.name.section.group.synx" }
-      }
+    "level3plus-keys": {
+      "patterns": [
+        {
+          "match": "^( {6,})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))?(\\[[^\\]]*\\])?((?::[a-zA-Z_]\\w*)+)\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "variable.parameter.level3.synx" },
+            "3": { "name": "storage.type.cast.synx" },
+            "4": { "name": "support.type.constraint.synx" },
+            "5": { "name": "keyword.control.marker.synx" },
+            "6": { "patterns": [{ "include": "#template-placeholder" }, { "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {6,})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)(\\(\\w+\\))(\\[[^\\]]*\\])?\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "variable.parameter.level3.synx" },
+            "3": { "name": "storage.type.cast.synx" },
+            "4": { "name": "support.type.constraint.synx" },
+            "5": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {6,})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s+(.*?)\\s*$",
+          "captures": {
+            "2": { "name": "support.type.property-name.level3.synx" },
+            "3": { "patterns": [{ "include": "#values" }] }
+          }
+        },
+        {
+          "match": "^( {6,})([^\\s\\[:#/!\\-(][^\\s\\[:(]*)\\s*$",
+          "name": "entity.name.section.level3.synx"
+        }
+      ]
     },
     "block-pipe": {
       "match": "\\|\\s*$",
