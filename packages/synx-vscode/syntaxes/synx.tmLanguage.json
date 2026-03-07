@@ -37,8 +37,15 @@
     },
     "comment-block": {
       "name": "comment.block.synx",
-      "begin": "^\\s*###\\s*$",
-      "end": "^\\s*###\\s*$",
+      "begin": "^(\\s*###)\\s*$",
+      "end": "^(\\s*###)\\s*$",
+      "beginCaptures": {
+        "1": { "name": "comment.block.synx" }
+      },
+      "endCaptures": {
+        "1": { "name": "comment.block.synx" }
+      },
+      "contentName": "comment.block.synx",
       "patterns": [
         { "include": "#comment-formatting" }
       ]
@@ -90,6 +97,14 @@
           "captures": {
             "1": { "name": "markup.inline.raw.synx" }
           }
+        },
+        {
+          "match": "\"([^\"]*)\"",
+          "name": "string.quoted.double.synx"
+        },
+        {
+          "match": "'([^']*)'",
+          "name": "string.quoted.single.synx"
         }
       ]
     },

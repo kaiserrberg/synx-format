@@ -8,6 +8,10 @@ All notable changes to this repository are documented in this file.
 - **`:ref` marker** (JS + Rust + VSCode): Value reference with marker chaining. Like `:alias` but feeds the resolved value into subsequent markers. Supports shorthand calc: `rate:ref:calc:*2 base_rate` resolves `base_rate` (50), then computes `50 * 2 = 100`.
 - **`:inherit` marker** (JS + Rust + VSCode): Block-level field inheritance. Merges all fields from a parent block into the child, with child values taking priority. Use `_` prefix for private template blocks excluded from output: `_base_resource` defines defaults, `steel:inherit:_base_resource` inherits them.
 - **`:i18n` marker** (JS + Rust + VSCode): Multilingual values with language selection. Nested keys are language codes (`en`, `ru`, `de`), selected via `options.lang`. Falls back to `en`, then first available value. Syntax: `title:i18n` with child keys per language.
+- **Comment string highlighting** (VSCode extension): Double-quoted `"strings"` and single-quoted `'strings'` inside comments now have distinct colors — orange for `""`, light blue for `''`.
+
+### Fixed
+- **Block comment content highlighting** (VSCode extension): Content inside `###` block comments was not highlighted as comments — only the `###` delimiters were colored. Fixed TextMate grammar to apply comment scope to all content between fences.
 
 ## [3.1.3] - 2026-03-08
 

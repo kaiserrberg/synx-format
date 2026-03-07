@@ -33,12 +33,24 @@ const codeDeco = vscode.window.createTextEditorDecorationType({
   light: { color: '#A31515', backgroundColor: '#00000008' },
 });
 
+const doubleQuoteDeco = vscode.window.createTextEditorDecorationType({
+  dark:  { color: '#CE9178' },   // orange (like strings)
+  light: { color: '#A31515' },
+});
+
+const singleQuoteDeco = vscode.window.createTextEditorDecorationType({
+  dark:  { color: '#9CDCFE' },   // light blue
+  light: { color: '#0070C1' },
+});
+
 // ── Patterns ──
 
 const BOLD_ITALIC_RE = /\*\*\*([^*]+)\*\*\*/g;
 const BOLD_RE        = /\*\*([^*]+)\*\*/g;
 const ITALIC_RE      = /(?<!\*)\*([^*]+)\*(?!\*)/g;
 const CODE_RE        = /`([^`]+)`/g;
+const DOUBLE_QUOTE_RE = /"([^"]*)"/g;
+const SINGLE_QUOTE_RE = /'([^']*)'/g;
 
 export function activateCommentStyling(ctx: vscode.ExtensionContext): void {
   const update = (editor?: vscode.TextEditor) => {
@@ -54,7 +66,7 @@ export function activateCommentStyling(ctx: vscode.ExtensionContext): void {
       const editor = vscode.window.activeTextEditor;
       if (editor && e.document === editor.document) update(editor);
     }),
-    italicDeco, boldDeco, boldItalicDeco, codeDeco,
+    italicDeco, boldDeco, boldItalicDeco, codeDeco, doubleQuoteDeco, singleQuoteDeco,
   );
 }
 
@@ -64,6 +76,8 @@ function applyCommentStyles(editor: vscode.TextEditor): void {
   const bolds: vscode.Range[] = [];
   const boldItalics: vscode.Range[] = [];
   const codes: vscode.Range[] = [];
+  const doubleQuotes: vscode.Range[] = [];
+  const singleQuotes: vscode.Range[] = [];
 
   let inBlock = false;
 
@@ -99,12 +113,16 @@ function applyCommentStyles(editor: vscode.TextEditor): void {
     collectMatches(commentText, BOLD_RE, offset, i, bolds);
     collectMatches(commentText, ITALIC_RE, offset, i, italics);
     collectMatches(commentText, CODE_RE, offset, i, codes);
+    collectMatches(commentText, DOUBLE_QUOTE_RE, offset, i, doubleQuotes);
+    collectMatches(commentText, SINGLE_QUOTE_RE, offset, i, singleQuotes);
   }
 
   editor.setDecorations(boldItalicDeco, boldItalics);
   editor.setDecorations(boldDeco, bolds);
   editor.setDecorations(italicDeco, italics);
   editor.setDecorations(codeDeco, codes);
+  editor.setDecorations(doubleQuoteDeco, doubleQuotes);
+  editor.setDecorations(singleQuoteDeco, singleQuotes);
 }
 
 function collectMatches(
