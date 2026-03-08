@@ -47,6 +47,8 @@ class SynxSecret {
   }
 }
 
+const SPAM_BUCKETS = new Map<string, number[]>();
+
 // ─── Engine ───────────────────────────────────────────────
 
 export function resolve(
@@ -93,6 +95,32 @@ export function resolve(
     // Apply markers
     if (!metaMap || !metaMap[key]) continue;
     const { markers, args } = metaMap[key];
+
+    // ── :spam ──
+    // Syntax: key:spam:MAX_CALLS:WINDOW_SEC target
+    // WINDOW_SEC defaults to 1 when omitted.
+    if (markers.includes('spam')) {
+      const idx = markers.indexOf('spam');
+      const maxCalls = parseInt(markers[idx + 1] ?? '0', 10);
+      const windowSec = Math.max(1, parseInt(markers[idx + 2] ?? '1', 10) || 1);
+
+      if (!Number.isFinite(maxCalls) || maxCalls <= 0) {
+        obj[key] = 'SPAM_ERR: invalid limit, use :spam:MAX[:WINDOW_SEC]';
+        continue;
+      }
+
+      const target = String(obj[key] ?? key);
+      const bucketKey = `${key}::${target}`;
+      if (!allowSpamAccess(bucketKey, maxCalls, windowSec)) {
+        obj[key] = `SPAM_ERR: '${target}' exceeded ${maxCalls} calls per ${windowSec}s`;
+        continue;
+      }
+
+      const resolvedTarget = deepGet(root, target) ?? deepGet(obj, target);
+      if (resolvedTarget !== undefined) {
+        obj[key] = resolvedTarget;
+      }
+    }
 
     // ── :include ──
     if (markers.includes('include') && typeof obj[key] === 'string') {
@@ -785,6 +813,22 @@ function replaceVars(expr: string, vars: Map<string, string>): string {
   let result = expr;
   for (const [k, v] of sorted) result = replaceWord(result, k, v);
   return result;
+}
+
+function allowSpamAccess(bucketKey: string, maxCalls: number, windowSec: number): boolean {
+  const now = Date.now();
+  const windowMs = windowSec * 1000;
+  const calls = SPAM_BUCKETS.get(bucketKey) ?? [];
+  const filtered = calls.filter((ts) => now - ts <= windowMs);
+
+  if (filtered.length >= maxCalls) {
+    SPAM_BUCKETS.set(bucketKey, filtered);
+    return false;
+  }
+
+  filtered.push(now);
+  SPAM_BUCKETS.set(bucketKey, filtered);
+  return true;
 }
 
 function deepGet(obj: SynxObject, path: string): SynxValue | undefined {

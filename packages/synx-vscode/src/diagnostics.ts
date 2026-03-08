@@ -10,7 +10,7 @@ import { parseSynx, ParsedDoc, SynxNode, safeCalc } from './parser';
 const KNOWN_MARKERS = new Set([
   'random', 'calc', 'env', 'alias', 'ref', 'inherit', 'i18n', 'secret', 'default',
   'unique', 'include', 'import', 'geo', 'template', 'split', 'join',
-  'clamp', 'round', 'map', 'format', 'fallback', 'once', 'version', 'watch',
+  'clamp', 'round', 'map', 'format', 'fallback', 'once', 'version', 'watch', 'spam',
 ]);
 
 const KNOWN_CONSTRAINTS = new Set([
@@ -20,6 +20,22 @@ const KNOWN_CONSTRAINTS = new Set([
 const KNOWN_TYPES = new Set(['int', 'float', 'bool', 'string', 'random', 'random:int', 'random:float', 'random:bool']);
 
 const DELIM_KEYWORDS = new Set(['space', 'pipe', 'dash', 'dot', 'semi', 'tab', 'slash']);
+
+const ARG_MARKERS = new Set([
+  'inherit',
+  'default',
+  'map',
+  'round',
+  'clamp',
+  'format',
+  'version',
+  'fallback',
+  'watch',
+  'i18n',
+  'include',
+  'import',
+  'spam',
+]);
 
 export function createDiagnostics(context: vscode.ExtensionContext): vscode.DiagnosticCollection {
   const collection = vscode.languages.createDiagnosticCollection('synx');
@@ -110,7 +126,10 @@ function runValidation(doc: vscode.TextDocument, collection: vscode.DiagnosticCo
 
     // ── Markers ──
     if (node.markers.length > 0) {
-      for (const marker of node.markers) {
+        const argIndexes = collectMarkerArgIndexes(node.markers);
+        for (let idx = 0; idx < node.markers.length; idx++) {
+          const marker = node.markers[idx];
+          if (argIndexes.has(idx)) continue;
         if (DELIM_KEYWORDS.has(marker) || /^\d+/.test(marker)) continue;
 
         if (!KNOWN_MARKERS.has(marker)) {
@@ -225,6 +244,31 @@ function runValidation(doc: vscode.TextDocument, collection: vscode.DiagnosticCo
             if (!hasOther) {
               diagnostics.push(mkDiag(langNode.line, langNode.column, langNode.column + langNode.key.length,
                 `Plural map for "${langNode.key}" should include "other"`, vscode.DiagnosticSeverity.Warning));
+            }
+          }
+        }
+      }
+
+      // ── :spam:MAX[:WINDOW] → validate rate-limit arguments ──
+      if (node.markers.includes('spam') && parsed.mode === 'active') {
+        const spamIdx = node.markers.indexOf('spam');
+        const limitRaw = node.markers[spamIdx + 1];
+        const windowRaw = node.markers[spamIdx + 2];
+
+        const limit = Number(limitRaw);
+        if (!limitRaw || !Number.isFinite(limit) || limit <= 0) {
+          const mpos = raw.indexOf(':spam');
+          diagnostics.push(mkDiag(node.line, mpos === -1 ? node.column : mpos, raw.length,
+            'Invalid :spam syntax. Use :spam:MAX_CALLS[:WINDOW_SEC]', vscode.DiagnosticSeverity.Warning));
+        }
+
+        if (windowRaw) {
+          const window = Number(windowRaw);
+          if (!Number.isFinite(window) || window <= 0) {
+            const wpos = raw.indexOf(windowRaw);
+            if (wpos !== -1) {
+              diagnostics.push(mkDiag(node.line, wpos, wpos + windowRaw.length,
+                'WINDOW_SEC in :spam must be a positive number', vscode.DiagnosticSeverity.Warning));
             }
           }
         }
@@ -349,4 +393,25 @@ function getInheritRefs(node: SynxNode): string[] {
   const raw = node.rawValue?.trim() ?? '';
   if (!raw) return [];
   return raw.split(/\s+/).filter(Boolean);
+}
+
+function collectMarkerArgIndexes(markers: string[]): Set<number> {
+  const result = new Set<number>();
+  for (let i = 0; i < markers.length; i++) {
+    const marker = markers[i];
+    if (!ARG_MARKERS.has(marker)) continue;
+
+    if (marker === 'inherit') {
+      for (let j = i + 1; j < markers.length; j++) {
+        if (KNOWN_MARKERS.has(markers[j])) break;
+        result.add(j);
+      }
+      continue;
+    }
+
+    if (i + 1 < markers.length && !KNOWN_MARKERS.has(markers[i + 1])) {
+      result.add(i + 1);
+    }
+  }
+  return result;
 }

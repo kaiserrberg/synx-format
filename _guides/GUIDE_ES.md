@@ -71,6 +71,7 @@
   - [:once — Generar y Persistir](#once--generar-y-persistir)
   - [:version — Comparación Semántica de Versiones](#version--comparación-semántica-de-versiones)
   - [:watch — Leer Archivo Externo](#watch--leer-archivo-externo)
+  - [:spam — Límite de Acceso](#spam--límite-de-acceso)
 - [Restricciones](#-restricciones)
 - [Encadenamiento de Marcadores](#-encadenamiento-de-marcadores)
 - [Ejemplos de Código](#-ejemplos-de-código)
@@ -476,7 +477,7 @@ std::fs::write("config.synx", Synx::format(&raw)).unwrap();
 
 ## 🧩 Referencia Completa de Marcadores
 
-SYNX v3.0 proporciona **20 marcadores**. Cada marcador es una función que se adjunta a una clave mediante la sintaxis `:marcador`.
+SYNX v3.0 proporciona **21 marcadores**. Cada marcador es una función que se adjunta a una clave mediante la sintaxis `:marcador`.
 
 ### `:env` — Variables de Entorno
 
@@ -826,6 +827,22 @@ Resultado: `true`. Operadores: `>=` `<=` `>` `<` `==` `!=`
 app_name:watch:name ./package.json
 config:watch ./data.txt
 ```
+
+### `:spam` — Límite de Acceso
+
+Limita cuántas veces se puede resolver una clave/archivo objetivo dentro de una ventana de tiempo.
+
+Sintaxis: `:spam:MAX_CALLS[:WINDOW_SEC]`.
+Si se omite `WINDOW_SEC`, se usa `1`.
+
+```synx
+!active
+secret_token abc
+access:spam:3:10 secret_token
+burst_access:spam:5 secret_token
+```
+
+Cuando se supera el límite, el motor devuelve `SPAM_ERR: ...`.
 
 ---
 
@@ -1352,7 +1369,7 @@ let config = Synx::parse("
 
 ### Visual Studio Code
 
-Soporte completo del lenguaje: resaltado de sintaxis, IntelliSense (20 marcadores), diagnósticos en tiempo real (15 verificaciones), ir a definición, formateo, vista previa de colores, sugerencias inline de `:calc`, vista previa JSON en vivo.
+Soporte completo del lenguaje: resaltado de sintaxis, IntelliSense (21 marcadores), diagnósticos en tiempo real (15 verificaciones), ir a definición, formateo, vista previa de colores, sugerencias inline de `:calc`, vista previa JSON en vivo.
 
 ### Visual Studio 2022
 

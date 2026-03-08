@@ -71,6 +71,7 @@
   - [:once — 生成并持久化](#once--生成并持久化)
   - [:version — 语义版本比较](#version--语义版本比较)
   - [:watch — 读取外部文件](#watch--读取外部文件)
+  - [:spam — 访问频率限制](#spam--访问频率限制)
 - [约束](#-约束)
 - [标记链](#-标记链)
 - [代码示例](#-代码示例)
@@ -475,7 +476,7 @@ std::fs::write("config.synx", Synx::format(&raw)).unwrap();
 
 ## 🧩 标记完整参考
 
-SYNX v3.0 提供 **20 个标记**。每个标记都是通过 `:标记` 语法附加到键的函数。
+SYNX v3.0 提供 **21 个标记**。每个标记都是通过 `:标记` 语法附加到键的函数。
 
 ### `:env` — 环境变量
 
@@ -825,6 +826,22 @@ runtime:version:>=:18.0 20.11.0
 app_name:watch:name ./package.json
 config:watch ./data.txt
 ```
+
+### `:spam` — 访问频率限制
+
+用于限制在时间窗口内对目标键/文件的解析次数。
+
+语法: `:spam:MAX_CALLS[:WINDOW_SEC]`。
+如果省略 `WINDOW_SEC`，默认值为 `1`。
+
+```synx
+!active
+secret_token abc
+access:spam:3:10 secret_token
+burst_access:spam:5 secret_token
+```
+
+超过限制时，引擎会返回 `SPAM_ERR: ...`。
 
 ---
 
@@ -1351,7 +1368,7 @@ let config = Synx::parse("
 
 ### Visual Studio Code
 
-完整语言支持：语法高亮、IntelliSense（20个标记）、实时诊断（15项检查）、跳转到定义、格式化、颜色预览、`:calc` 内联提示、实时 JSON 预览。
+完整语言支持：语法高亮、IntelliSense（21个标记）、实时诊断（15项检查）、跳转到定义、格式化、颜色预览、`:calc` 内联提示、实时 JSON 预览。
 
 ### Visual Studio 2022
 

@@ -329,6 +329,31 @@ title:i18n
     `, { lang: 'fr' });
     expect(data.title).toBe('Hello');
   });
+
+  test(':spam limits repeated access within window', () => {
+    const src = `
+!active
+secret_token abc
+access:spam:1:5 secret_token
+`;
+
+    const first = Synx.parse(src);
+    expect(first.access).toBe('abc');
+
+    const second = Synx.parse(src);
+    expect(String(second.access)).toContain('SPAM_ERR:');
+  });
+
+  test(':spam defaults window to 1 second when omitted', () => {
+    const uniqueKey = `key_${Date.now()}`;
+    const src = `
+!active
+${uniqueKey} 1
+x:spam:2 ${uniqueKey}
+`;
+    const data = Synx.parse(src);
+    expect(data.x).toBe(1);
+  });
 });
 
 // ─── Export format tests ─────────────────────────────────

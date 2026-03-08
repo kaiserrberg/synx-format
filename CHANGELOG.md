@@ -8,6 +8,7 @@ Quick reference of what was modified in recent versions:
 
 | Version | Components Modified |
 |---------|---|
+| **3.4.0** | synx-core (`:spam` rate-limit marker), synx-js (`:spam` + strict error sync), VSCode (diagnostics/completion/navigation/preview for `:spam`), guides (all languages), version sync |
 | **3.3.0** | synx-core (multi-parent inherit, calc dot-path, i18n plural, quoted strings, :import alias), VSCode (diagnostics/completion/navigation sync), documentation |
 | **3.2.3** | synx-core (global [] constraints), documentation, version sync |
 | **3.2.2** | synx-core (type validation), documentation |
@@ -16,6 +17,20 @@ Quick reference of what was modified in recent versions:
 | **3.1.3** | VSCode extension, JS/TS API, documentation (6 guides), CLI tool, deployment examples |
 | **3.1.2** | JS parser, Rust parser, VSCode extension, Node.js binding (napi), all guides |
 | **3.1.0** | JS/TS API (runtime manipulation), Rust engine, VSCode extension, all guides |
+
+---
+
+## [3.4.0] - 2026-03-08
+
+### Added
+- **`:spam` marker** (Rust engine + JS engine + VSCode preview parser): `key:spam:MAX_CALLS[:WINDOW_SEC] target` limits how often a target can be resolved inside a time window. If `WINDOW_SEC` is omitted, it defaults to `1`.
+- **Rate-limit error surface**: Engines now emit `SPAM_ERR: ...` when the limit is exceeded.
+- **VSCode support for `:spam`**: marker recognition in diagnostics, argument validation (`MAX_CALLS`, `WINDOW_SEC`), completion docs/snippet, and go-to-definition support for `:spam` target references.
+
+### Changed
+- **Strict runtime mode update (JS)**: `SPAM_ERR` is now treated as a strict-mode runtime error prefix (same fail-fast behavior as `INCLUDE_ERR`, `WATCH_ERR`, `CALC_ERR`, `CONSTRAINT_ERR`).
+- **Version sync to `3.4.0`** across core and binding/package manifests.
+- **Guide updates**: added `:spam` marker documentation to all language guides.
 
 ---
 

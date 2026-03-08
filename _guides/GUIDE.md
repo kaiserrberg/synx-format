@@ -72,6 +72,7 @@
   - [:once](#once--generate-and-persist)
   - [:version](#version--semantic-version-compare)
   - [:watch](#watch--read-external-file)
+  - [:spam](#spam--rate-limit-access)
 - [Constraints](#-constraints)
 - [Marker Chaining](#-marker-chaining)
 - [Code Examples](#-code-examples)
@@ -688,7 +689,7 @@ std::fs::write("config.synx", canonical).unwrap();
 
 ## 🧩 Markers — Full Reference
 
-SYNX v3.0 ships with **20 markers**. Each marker is a function attached to a key with `:marker` syntax.
+SYNX v3.0 ships with **21 markers**. Each marker is a function attached to a key with `:marker` syntax.
 
 > **All markers require `!active` mode.**
 
@@ -1515,6 +1516,27 @@ The file is re-read every time the SYNX document is parsed — enabling live/hot
 
 ---
 
+### `:spam` — Rate-Limit Access
+
+Limits how often a target key/file reference can be resolved inside a time window.
+
+Syntax: `:spam:MAX_CALLS[:WINDOW_SEC]`.
+If `WINDOW_SEC` is omitted, it defaults to `1`.
+
+```synx
+!active
+
+secret_token abc
+access:spam:3:10 secret_token
+
+# WINDOW_SEC defaults to 1
+burst_access:spam:5 secret_token
+```
+
+When exceeded, engines return `SPAM_ERR: ...`.
+
+---
+
 ## 🔒 Constraints
 
 Constraints validate values at parse time. They're defined inside `[brackets]` after the key name.
@@ -2208,7 +2230,7 @@ Full language support with 15+ features:
 | Feature | Description |
 |---|---|
 | **Syntax Highlighting** | Keys, values, markers, constraints, comments, types, colors |
-| **IntelliSense** | Autocomplete for 20 markers, 7 constraints, type casts |
+| **IntelliSense** | Autocomplete for 21 markers, 7 constraints, type casts |
 | **Hover Info** | Documentation on hover for every marker and constraint |
 | **Diagnostics** | 15 real-time validation checks with severity levels |
 | **Go to Definition** | Ctrl+Click on `:alias`, `:template`, `:calc`, `:include` |
@@ -2227,7 +2249,7 @@ Install: search **"SYNX"** in VS Code Extensions, or `code --install-extension A
 
 MEF-based extension with:
 - Syntax highlighting (classifier)
-- IntelliSense (20 markers, 7 constraints)
+- IntelliSense (21 markers, 7 constraints)
 - Error tagger (diagnostics)
 - Outlining (code folding)
 - Inlay hints for `:calc`
@@ -2245,7 +2267,7 @@ synx-format/
 │   └── synx-core/            # Rust core — parser + engine
 │       └── src/
 │           ├── parser.rs      # Text → Value tree
-│           ├── engine.rs      # Marker resolution (20 markers)
+│           ├── engine.rs      # Marker resolution (21 markers)
 │           ├── calc.rs        # Safe math evaluator
 │           ├── value.rs       # Value enum, Options, Meta types
 │           └── lib.rs         # Public API: Synx::parse()
@@ -2259,7 +2281,7 @@ synx-format/
 │   │   └── src/
 │   │       ├── index.ts       # Auto-engine: JS ↔ Rust switch
 │   │       ├── parser.ts      # 100% JS parser
-│   │       ├── engine.ts      # 100% JS engine (20 markers)
+│   │       ├── engine.ts      # 100% JS engine (21 markers)
 │   │       ├── calc.ts        # Safe math evaluator (JS)
 │   │       └── types.ts       # TypeScript interfaces
 │   │
@@ -2267,7 +2289,7 @@ synx-format/
 │   │   └── src/
 │   │       ├── extension.ts   # Entry point
 │   │       ├── parser.ts      # AST parser with position info
-│   │       ├── completion.ts  # IntelliSense (20 markers)
+│   │       ├── completion.ts  # IntelliSense (21 markers)
 │   │       ├── diagnostics.ts # 15 validation checks
 │   │       ├── navigation.ts  # Symbols, GoTo, References
 │   │       ├── formatter.ts   # Code formatting

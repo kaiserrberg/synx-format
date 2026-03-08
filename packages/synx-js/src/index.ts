@@ -49,6 +49,7 @@ const RUNTIME_ERROR_PREFIXES = [
   'INCLUDE_ERR:',
   'WATCH_ERR:',
   'CALC_ERR:',
+  'SPAM_ERR:',
   'CONSTRAINT_ERR:',
 ] as const;
 

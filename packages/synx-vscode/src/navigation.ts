@@ -138,6 +138,22 @@ export function createDefinitionProvider(): vscode.Disposable {
         }
       }
 
+      // :spam target → go to referenced key under cursor
+      if (currentNode?.markers.includes('spam')) {
+        const wordR = doc.getWordRangeAtPosition(position, /[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)*/);
+        if (wordR) {
+          const word = doc.getText(wordR);
+          const parentPath = currentNode.dotPath.includes('.')
+            ? currentNode.dotPath.substring(0, currentNode.dotPath.lastIndexOf('.'))
+            : '';
+          const target = parsed.keyMap.get(word) ?? (parentPath ? parsed.keyMap.get(`${parentPath}.${word}`) : undefined);
+          if (target) {
+            return new vscode.Location(doc.uri,
+              new vscode.Position(target.line, target.column));
+          }
+        }
+      }
+
       // :include / :import <path> → go to file
       if ((currentNode?.markers.includes('include') || currentNode?.markers.includes('import')) && currentNode.rawValue) {
         const filePath = currentNode.rawValue.trim();

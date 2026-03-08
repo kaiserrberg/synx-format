@@ -35,6 +35,12 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Python version info
+        if: matrix.check == 'python-smoke'
+        run: |
+          python --version
+          python -c "import sys; print(sys.executable)"
+
       - name: Core tests
         if: matrix.check == 'core-tests'
         run: cargo test -p synx-core
@@ -43,6 +49,7 @@ jobs:
         if: matrix.check == 'python-smoke'
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
+          PYO3_PYTHON: python
         run: cargo test -p synx-python --lib
 
       - name: C FFI smoke (Rust unit tests)

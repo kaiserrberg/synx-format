@@ -2,10 +2,14 @@
 //! in a parsed SYNX value tree. Only runs in !active mode.
 
 use std::collections::HashMap;
+use std::sync::{Mutex, OnceLock};
+use std::time::{Duration, Instant};
 use crate::calc::safe_calc;
 use crate::parser;
 use crate::rng;
 use crate::value::*;
+
+static SPAM_BUCKETS: OnceLock<Mutex<HashMap<String, Vec<Instant>>>> = OnceLock::new();
 
 /// Resolve all active-mode markers in a ParseResult.
 /// Returns the resolved root Value.
@@ -130,6 +134,58 @@ fn apply_markers(
     _includes: &HashMap<String, Value>,
 ) {
     let markers = &meta.markers;
+
+    // ── :spam ──
+    // Syntax: key:spam:MAX_CALLS:WINDOW_SEC target
+    // WINDOW_SEC defaults to 1 when omitted.
+    // If target is a key path, resolves its value after passing the limit check.
+    if markers.contains(&"spam".to_string()) {
+        let spam_idx = markers.iter().position(|m| m == "spam").unwrap();
+        let max_calls = markers
+            .get(spam_idx + 1)
+            .and_then(|s| s.parse::<usize>().ok())
+            .unwrap_or(0);
+        let window_sec = markers
+            .get(spam_idx + 2)
+            .and_then(|s| s.parse::<u64>().ok())
+            .unwrap_or(1);
+
+        if max_calls == 0 {
+            map.insert(
+                key.to_string(),
+                Value::String("SPAM_ERR: invalid limit, use :spam:MAX[:WINDOW_SEC]".to_string()),
+            );
+            return;
+        }
+
+        let target = map
+            .get(key)
+            .map(value_to_string)
+            .unwrap_or_else(|| key.to_string());
+        let bucket_key = format!("{}::{}", key, target);
+
+        if !allow_spam_access(&bucket_key, max_calls, window_sec) {
+            map.insert(
+                key.to_string(),
+                Value::String(format!(
+                    "SPAM_ERR: '{}' exceeded {} calls per {}s",
+                    target, max_calls, window_sec
+                )),
+            );
+            return;
+        }
+
+        if let Some(resolved) = map
+            .get(key)
+            .and_then(|v| {
+                let t = value_to_string(v);
+                let root_ref = unsafe { &*root_ptr };
+                deep_get(root_ref, &t).or_else(|| map.get(t.as_str()).cloned())
+            })
+        {
+            map.insert(key.to_string(), resolved);
+        }
+    }
 
     // ── :include / :import ──
     if markers.contains(&"include".to_string()) || markers.contains(&"import".to_string()) {
@@ -915,6 +971,35 @@ fn compare_versions(current: &str, op: &str, required: &str) -> bool {
         "==" | "=" => ord == std::cmp::Ordering::Equal,
         "!=" => ord != std::cmp::Ordering::Equal,
         _ => false,
+    }
+}
+
+fn allow_spam_access(bucket_key: &str, max_calls: usize, window_sec: u64) -> bool {
+    let now = Instant::now();
+    let window = Duration::from_secs(window_sec.max(1));
+
+    let buckets = SPAM_BUCKETS.get_or_init(|| Mutex::new(HashMap::new()));
+    let mut guard = match buckets.lock() {
+        Ok(g) => g,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+
+    let calls = guard.entry(bucket_key.to_string()).or_default();
+    calls.retain(|ts| now.duration_since(*ts) <= window);
+
+    if calls.len() >= max_calls {
+        return false;
+    }
+
+    calls.push(now);
+    true
+}
+
+#[cfg(test)]
+fn clear_spam_buckets() {
+    let buckets = SPAM_BUCKETS.get_or_init(|| Mutex::new(HashMap::new()));
+    if let Ok(mut guard) = buckets.lock() {
+        guard.clear();
     }
 }
 
@@ -1759,5 +1844,33 @@ mod tests {
         assert_eq!(map["status"], Value::Null);
         assert_eq!(map["enabled"], Value::Bool(true));
         assert_eq!(map["count"], Value::Int(42));
+    }
+
+    #[test]
+    fn test_spam_rate_limit_exceeded() {
+        super::clear_spam_buckets();
+
+        let mut r1 = parse("!active\nsecret_token abc\naccess:spam:1:5 secret_token");
+        resolve(&mut r1, &Options::default());
+        let map1 = r1.root.as_object().unwrap();
+        assert_eq!(map1["access"], Value::String("abc".into()));
+
+        let mut r2 = parse("!active\nsecret_token abc\naccess:spam:1:5 secret_token");
+        resolve(&mut r2, &Options::default());
+        let map2 = r2.root.as_object().unwrap();
+        match &map2["access"] {
+            Value::String(s) => assert!(s.starts_with("SPAM_ERR:")),
+            _ => panic!("Expected SPAM_ERR string"),
+        }
+    }
+
+    #[test]
+    fn test_spam_default_window_sec_is_one() {
+        super::clear_spam_buckets();
+
+        let mut r = parse("!active\na 1\nx:spam:2 a");
+        resolve(&mut r, &Options::default());
+        let map = r.root.as_object().unwrap();
+        assert_eq!(map["x"], Value::Int(1));
     }
 }

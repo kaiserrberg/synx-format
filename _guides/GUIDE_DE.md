@@ -71,6 +71,7 @@
   - [:once — Generieren und Persistieren](#once--generieren-und-persistieren)
   - [:version — Semantischer Versionsvergleich](#version--semantischer-versionsvergleich)
   - [:watch — Externe Datei Lesen](#watch--externe-datei-lesen)
+  - [:spam — Zugriffslimit](#spam--zugriffslimit)
 - [Einschränkungen](#-einschränkungen)
 - [Marker-Verkettung](#-marker-verkettung)
 - [Codebeispiele](#-codebeispiele)
@@ -476,7 +477,7 @@ std::fs::write("config.synx", Synx::format(&raw)).unwrap();
 
 ## 🧩 Vollständige Marker-Referenz
 
-SYNX v3.0 bietet **20 Marker**. Jeder Marker ist eine Funktion, die über die `:marker`-Syntax an einen Schlüssel angehängt wird.
+SYNX v3.0 bietet **21 Marker**. Jeder Marker ist eine Funktion, die über die `:marker`-Syntax an einen Schlüssel angehängt wird.
 
 ### `:env` — Umgebungsvariablen
 
@@ -826,6 +827,22 @@ Ergebnis: `true`. Operatoren: `>=` `<=` `>` `<` `==` `!=`
 app_name:watch:name ./package.json
 config:watch ./data.txt
 ```
+
+### `:spam` — Zugriffslimit
+
+Begrenzt, wie oft ein Zielschlüssel/eine Datei in einem Zeitfenster aufgelöst werden darf.
+
+Syntax: `:spam:MAX_CALLS[:WINDOW_SEC]`.
+Wenn `WINDOW_SEC` fehlt, wird `1` verwendet.
+
+```synx
+!active
+secret_token abc
+access:spam:3:10 secret_token
+burst_access:spam:5 secret_token
+```
+
+Bei Überschreitung wird `SPAM_ERR: ...` zurückgegeben.
 
 ---
 
@@ -1352,7 +1369,7 @@ let config = Synx::parse("
 
 ### Visual Studio Code
 
-Vollständige Sprachunterstützung: Syntaxhervorhebung, IntelliSense (20 Marker), Echtzeit-Diagnose (15 Prüfungen), Gehe-zu-Definition, Formatierung, Farbvorschau, `:calc` Inline-Hinweise, Live-JSON-Vorschau.
+Vollständige Sprachunterstützung: Syntaxhervorhebung, IntelliSense (21 Marker), Echtzeit-Diagnose (15 Prüfungen), Gehe-zu-Definition, Formatierung, Farbvorschau, `:calc` Inline-Hinweise, Live-JSON-Vorschau.
 
 ### Visual Studio 2022
 

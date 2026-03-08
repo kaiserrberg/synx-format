@@ -71,6 +71,7 @@
   - [:once — 生成して永続化](#once--生成して永続化)
   - [:version — セマンティックバージョン比較](#version--セマンティックバージョン比較)
   - [:watch — 外部ファイルの読み取り](#watch--外部ファイルの読み取り)
+  - [:spam — アクセス頻度制限](#spam--アクセス頻度制限)
 - [制約](#-制約)
 - [マーカーチェーン](#-マーカーチェーン)
 - [コード例](#-コード例)
@@ -475,7 +476,7 @@ std::fs::write("config.synx", Synx::format(&raw)).unwrap();
 
 ## 🧩 マーカー完全リファレンス
 
-SYNX v3.0は**20のマーカー**を提供します。各マーカーは `:マーカー` 構文でキーに付加される関数です。
+SYNX v3.0は**21のマーカー**を提供します。各マーカーは `:マーカー` 構文でキーに付加される関数です。
 
 ### `:env` — 環境変数
 
@@ -825,6 +826,22 @@ runtime:version:>=:18.0 20.11.0
 app_name:watch:name ./package.json
 config:watch ./data.txt
 ```
+
+### `:spam` — アクセス頻度制限
+
+指定した時間窓の中で、対象キー/ファイルへの解決回数を制限します。
+
+構文: `:spam:MAX_CALLS[:WINDOW_SEC]`。
+`WINDOW_SEC` を省略した場合は `1` が使われます。
+
+```synx
+!active
+secret_token abc
+access:spam:3:10 secret_token
+burst_access:spam:5 secret_token
+```
+
+上限を超えると `SPAM_ERR: ...` が返されます。
 
 ---
 
@@ -1351,7 +1368,7 @@ let config = Synx::parse("
 
 ### Visual Studio Code
 
-完全な言語サポート：シンタックスハイライト、IntelliSense（20マーカー）、リアルタイム診断（15項目チェック）、定義へジャンプ、フォーマット、カラープレビュー、`:calc` インラインヒント、ライブJSONプレビュー。
+完全な言語サポート：シンタックスハイライト、IntelliSense（21マーカー）、リアルタイム診断（15項目チェック）、定義へジャンプ、フォーマット、カラープレビュー、`:calc` インラインヒント、ライブJSONプレビュー。
 
 ### Visual Studio 2022
 

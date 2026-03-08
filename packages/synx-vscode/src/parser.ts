@@ -37,6 +37,8 @@ export interface ParsedDoc {
   lines: string[];
 }
 
+const spamBuckets = new Map<string, number[]>();
+
 // ─── Regex ───────────────────────────────────────────────────────────────────
 
 const LINE_RE = /^([^\s\[:\-#/(][^\s\[:(]*)(?:\(([\w:]+)\))?(?:\[([^\]]*)\])?(?::([^\s]+))?\s*(.*)$/;
@@ -408,6 +410,30 @@ function resolveWithNodes(nodes: SynxNode[], obj: Record<string, SynxVal>, root:
           if (result !== null) obj[n.key] = result;
           break;
         }
+        case 'spam': {
+          const maxCalls = Number(n.markers[mi + 1] ?? '0');
+          const windowSec = Number(n.markers[mi + 2] ?? '1');
+          const limit = Number.isFinite(maxCalls) ? Math.trunc(maxCalls) : 0;
+          const window = Number.isFinite(windowSec) && windowSec > 0 ? windowSec : 1;
+
+          if (limit <= 0) {
+            obj[n.key] = 'SPAM_ERR: invalid limit, use :spam:MAX[:WINDOW_SEC]';
+            break;
+          }
+
+          const target = String(obj[n.key] ?? n.key);
+          const bucketKey = `${n.dotPath}::${target}`;
+          if (!allowSpamAccess(bucketKey, limit, window)) {
+            obj[n.key] = `SPAM_ERR: '${target}' exceeded ${limit} calls per ${window}s`;
+            break;
+          }
+
+          const resolved = deepGet(root, target) ?? deepGet(obj, target);
+          if (resolved !== undefined) {
+            obj[n.key] = resolved;
+          }
+          break;
+        }
         case 'random': {
           const arr = obj[n.key];
           if (Array.isArray(arr) && arr.length > 0) {
@@ -523,6 +549,22 @@ function getPluralCategory(lang: string, count: number): string {
   }
 
   return abs === 1 ? 'one' : 'other';
+}
+
+function allowSpamAccess(bucketKey: string, maxCalls: number, windowSec: number): boolean {
+  const now = Date.now();
+  const windowMs = windowSec * 1000;
+  const calls = spamBuckets.get(bucketKey) ?? [];
+  const recent = calls.filter((ts) => now - ts <= windowMs);
+
+  if (recent.length >= maxCalls) {
+    spamBuckets.set(bucketKey, recent);
+    return false;
+  }
+
+  recent.push(now);
+  spamBuckets.set(bucketKey, recent);
+  return true;
 }
 
 function evalExpr(s: string): number {
